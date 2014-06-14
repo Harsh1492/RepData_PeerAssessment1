@@ -1,0 +1,15 @@
+{
+    "contents" : "## Reproductible Research\nby Roger D. Peng, PhD, Jeff Leek, PhD, Brian Caffo, PhD\n\nCoursera - June 2014 session \n\n#### Assignement 1 in https://github.com/coursera-jm/RepData_PeerAssessment1\n\n\n### Introduction\n\n  - Instructions are in the \"doc\" sub-directory\" (instructions.pdf). \n  - This analysis is performed through PA1_template.Rmd, which is compiled to PA1_template.md which, in turn, generates an HTML output: PA1_template.html. As per assignement instructions, these files are located in the root directory of this GitHub repository (https://github.com/coursera-jm/RepData_PeerAssessment1).\n  - Data are saved in the \"data\" sub-directory.\n  - Figures are generated in the \"figures\" sub-directory.\n  \n### Data\n\nThe data for this assignment can be downloaded from the course web site: [Activity monitoring data] (https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip) [52K].\n\nThe variables included in this dataset are:\n\n* **steps**: Number of steps taking in a 5-minute interval (missing values are coded as `NA`).\n* **date**: The date on which the measurement was taken in YYYY-MM-DD format.\n* **interval**: Identifier for the 5-minute interval in which measurement was taken.\n\nThe dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this\ndataset.\n\n### Analysis \n\nThe following step are documented in \"PA1_template.Rmd\":\n\n* Loading and preprocessing the data.\n* What is mean total number of steps taken per day?\n* What is the average daily activity pattern?\n* Imputing missing values.\n* Are there differences in activity patterns between weekdays and weekends?",
+    "created" : 1402595075264.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1262593012",
+    "id" : "17D2913F",
+    "lastKnownWriteTime" : 1402599787,
+    "path" : "~/coursera/coursera-data-science/reproductible-research/RepData_PeerAssessment1/README.md",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "markdown"
+}

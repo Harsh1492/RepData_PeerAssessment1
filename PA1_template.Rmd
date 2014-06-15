@@ -176,23 +176,24 @@ str(meanStepsPerInterval)
 We replace each missing steps value buy the average number of steps calculated for the same interval over all other available dates.
 ```{r datasetMissings}
 # replace missig values w
-withoutMissing <- dataset
-for(r in 1:nrow(withoutMissing)){
-  if (is.na(withoutMissing$steps[r])) {
-    repl <- meanStepsPerInterval$steps[meanStepsPerInterval$interval == withoutMissing$interval[r]];
-    withoutMissing$steps[r] <- repl;
+datasetNoMissing <- dataset
+for(r in 1:nrow(datasetNoMissing)){
+  if (is.na(datasetNoMissing$steps[r])) {
+    repl <- meanStepsPerInterval$steps[meanStepsPerInterval$interval == datasetNoMissing$interval[r]];
+    datasetNoMissing$steps[r] <- repl;
   }
 }
 # we verify it worked
 sum(is.na(dataset$steps))
-sum(is.na(withoutMissing$steps))
-str(withoutMissing$steps)
+sum(is.na(datasetNoMissing$steps))
+str(dataset)
+str(datasetNoMissing)
 ```
 
 4.4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
 ```{r histogramMissingsEstimated, fig.height=6, fig.width=10}
 library(lattice)
-sumStepsPerDayNoMissing <- aggregate(steps ~ date, data=withoutMissing, sum)
+sumStepsPerDayNoMissing <- aggregate(steps ~ date, data=datasetNoMissing, sum)
 histogram(sumStepsPerDayNoMissing$steps, breaks=10, main="Total number of steps per day (missing estimated)", xlab="Steps per day")
 mean(sumStepsPerDayNoMissing$steps, na.rm=TRUE)
 median(sumStepsPerDayNoMissing$steps, na.rm=TRUE)
@@ -214,18 +215,23 @@ For this part the "weekdays()" function may be of some help here. Use the datase
 
 5.1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 ```{r createWeekDayWeekEndFactor}
-dataset$day <-"weekday"
-dataset$day[weekdays(as.Date(dataset$date), abb=T) %in% c("Sat","Sun")] <- "weekend"
+datasetNoMissing$day <- "weekday"
+datasetNoMissing$day[weekdays(as.Date(datasetNoMissing$date), abb=T) %in% c("Sat","Sun")] <- "weekend"
 ```
-
+datasetNoMissing$day contains "weekday" or "weekend".
+```{r showDatasetNoMissingDay}
+table(datasetNoMissing$day)
+```
 
 5.2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 ```{r timeSeriesPlotMissingsEstimatedWeekDayWeekEnd, fig.height=8, fig.width=12}
-intervalDay <- aggregate(steps ~ interval + day, data=dataset, mean)
-plot(steps ~ interval, data=intervalDay, type="l")
-plot(steps ~ day, data=intervalDay, type="l")
-table(intervalDay)
+meanStepsPerIntervalNoMissingDay <- aggregate(steps ~ interval + day, data=datasetNoMissing, FUN="mean")
+str(meanStepsPerIntervalNoMissingDay)
+xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay[meanStepsPerIntervalNoMissingDay$day=="weekday",], type="l", grid=T)
+xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay[meanStepsPerIntervalNoMissingDay$day=="weekend",], type="l", grid=T)
 ```
+
+We can visualy observe that the number of steps are high for all intervals during weekend days, whereas they are concentrated in the morning hours for weekdays.
 
 ## References
 

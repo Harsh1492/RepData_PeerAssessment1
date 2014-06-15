@@ -137,18 +137,13 @@ median(sumStepsPerDay$steps, na.rm=TRUE)
 
 3.1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r timeSeriesPlot, fig.height=6, fig.width=10}
-xyplot(steps ~ interval, data=meanStepsPerInterval, type="l")
+xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE)
 ```
 
 
 3.2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ```{r modeInterval}
-# mode, e.g. http://stackoverflow.com/questions/2547402/standard-library-function-in-r-for-finding-the-mode
-Mode <- function(x) {
-  ux <- unique(x)
-  ux[which.max(tabulate(match(x, ux)))]
-}
-Mode(dataset$interval)
+meanStepsPerInterval$interval[which.max(meanStepsPerInterval$steps)]
 ```
 
 ### 4. Imputing missing values
@@ -218,4 +213,4 @@ table(intervalDay)
 
 2. R Markdown Page. URL: http://www.rstudio.com/ide/docs/authoring/using_markdown. 
 
-
+3. Lattice: Multivariate Data Visualization with R available via SpringerLink by Deepayan Sarkar, Springer, 2008.

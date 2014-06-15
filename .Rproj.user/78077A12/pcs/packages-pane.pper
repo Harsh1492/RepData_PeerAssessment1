@@ -1,7 +1,0 @@
-{
-    "installOptions" : {
-        "installDependencies" : true,
-        "installFromRepository" : true,
-        "libraryPath" : "/disks/T1/Software/R/i686-pc-linux-gnu-library/3.1"
-    }
-}

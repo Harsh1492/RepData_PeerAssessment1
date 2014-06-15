@@ -218,7 +218,7 @@ Rversion &lt;- version$version.string
 <p>This analysis has been performed using R software package for statistical analysis.
 The version of R used was R version 3.1.0 (2014-04-10).</p>
 
-<p>This document has been generated on 15-Jun-2014 at 14:14:43.</p>
+<p>This document has been generated on 15-Jun-2014 at 14:37:53.</p>
 
 <h2>Analysis as per assignement</h2>
 
@@ -298,7 +298,7 @@ dataset$elapsed &lt;- dataset$hour * 60 + dataset$minute
 dataset$interval &lt;- as.factor(sprintf(&quot;%02d:%02d&quot;, dataset$hour, dataset$minute))
 </code></pre>
 
-<p>As a pre-processinf step, we need to sum the number of steps for each day in order to prepare the following analysis. Aggregate with the sum fuction does the trick. </p>
+<p>As a pre-processing step, we sum the number of steps for each day, and we average the number of steps for each interval, in order to prepare further analysis. Aggregate with the sum and mean fuction does the trick. </p>
 
 <pre><code class="r"># create a table with number of steps per day
 sumStepsPerDay &lt;- aggregate(steps ~ date, data=dataset, FUN=&quot;sum&quot;, na.exclude=T)
@@ -358,12 +358,6 @@ meanStepsPerInterval &lt;- aggregate(steps ~ interval, data=dataset, FUN=&quot;m
 
 <pre><code class="r">misst &lt;- sum(is.na(dataset$steps))
 misst
-</code></pre>
-
-<pre><code>## [1] 2304
-</code></pre>
-
-<pre><code class="r">sum(is.na(dataset$steps))
 </code></pre>
 
 <pre><code>## [1] 2304
@@ -466,9 +460,11 @@ histogram(sumStepsPerDayNoMissing$steps, breaks=10, main=&quot;Total number of s
 <pre><code>## [1] 10766
 </code></pre>
 
-<p>Do these values differ from the estimates from the first part of the assignment? </p>
+<p>Do these values differ from the estimates from the first part of the assignment? 
+Estimating the missing value doesn&#39;t change the shape of the histogram. The median and the mean aren&#39;t change either.</p>
 
-<p>What is the impact of imputing missing data on the estimates of the total daily number of steps?</p>
+<p>What is the impact of imputing missing data on the estimates of the total daily number of steps?
+The total daily number of steps increases as a result of added values, specially around the mean.</p>
 
 <p>4.5. Make a time series plot (i.e. type = &ldquo;l&rdquo;) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)</p>
 

@@ -99,13 +99,18 @@ dataset$date <- as.Date(dataset$date)
 ```
 
 
-b. Intervals are stored as a number in the form of hhmm where hh=hours and mm= minutes. We create 2 variables: time since minght, in minutes, and a string factor instead of the numeric concatenation of hours and minutes.
+b. Intervals are stored as a number in the form of hhmm where hh=hours and mm= minutes. We create 2 variables: time since minight, in minutes, and a string factor instead of the numeric concatenation of hours and minutes.
 ```{r processData2}
 dataset$minute <- dataset$interval %% 100
 dataset$hour <- dataset$interval %/% 100
 dataset$elapsed <- dataset$hour * 60 + dataset$minute
-# replace interval by a factor
-dataset$interval <- as.factor(sprintf("%02d:%02d", dataset$hour, dataset$minute))
+# interval as a factor
+dataset$sInterval <- as.factor(sprintf("%02d:%02d", dataset$hour, dataset$minute))
+```
+
+We also replace the interval ID by hundredths in order to have a better visualisation (hours). 
+```{r hundredth}
+dataset$interval <- dataset$interval / 100
 ```
 
 As a pre-processing step, we sum the number of steps for each day, and we average the number of steps for each interval, in order to prepare further analysis. Aggregate with the sum and mean fuction does the trick. 
@@ -141,14 +146,14 @@ median(sumStepsPerDay$steps, na.rm=TRUE)
 
 3.1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r timeSeriesPlot, fig.height=6, fig.width=10}
-xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE)
+xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE, ylab="Number of steps", xlab="5-min. intervals from midnight", main="Average number of steps by 5-minutes intervals")
 ```
 
 
 3.2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r modeInterval}
-intv <- meanStepsPerInterval$interval[which.max(meanStepsPerInterval$steps)]
+intv <- meanStepsPerInterval$sInterval[which.max(meanStepsPerInterval$steps)]
 ```
 
 The ```r intv``` interval contains the maximum number of steps averaged over all days.
@@ -216,9 +221,9 @@ What is the impact of imputing missing data on the estimates of the total daily 
 
 
 4.5. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r timeSeriesPlotMissingsEstimated, fig.height=8, fig.width=12}
+```{r timeSeriesPlotMissingsEstimated, fig.height=6, fig.width=10}
 meanStepsPerIntervalNoMissing <- aggregate(steps ~ interval, data=dataset, FUN="mean", na.exclude=T)
-xyplot(meanStepsPerIntervalNoMissing$steps ~ meanStepsPerIntervalNoMissing$interval,type="l", grid=T)
+xyplot(meanStepsPerIntervalNoMissing$steps ~ meanStepsPerIntervalNoMissing$interval,type="l", grid=T, ylab="Number of steps", xlab="5-min. intervals from midnight", main="Average number of steps by 5-minutes intervals, missing values estimated")
 ```
 
 
@@ -239,15 +244,19 @@ table(datasetNoMissing$day)
 
 
 5.2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
-```{r timeSeriesPlotMissingsEstimatedWeekDayWeekEnd, fig.height=8, fig.width=12}
+
+First, let's produce the graph as per assgnement exemple (2 superposedpanesl):
+```{r timeSeriesPlotMissingsEstimatedWeekDayWeekEnd, fig.height=6, fig.width=10}
 meanStepsPerIntervalNoMissingDay <- aggregate(steps ~ interval + day, data=datasetNoMissing, FUN="mean")
-str(meanStepsPerIntervalNoMissingDay)
-xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay[meanStepsPerIntervalNoMissingDay$day=="weekday",], type="l", grid=T)
-xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay[meanStepsPerIntervalNoMissingDay$day=="weekend",], type="l", grid=T)
+xyplot(steps ~ interval | day, data=meanStepsPerIntervalNoMissingDay, type="l", grid=T, layout=c(1,2), ylab="Number of steps", xlab="5min intervals from midnight", main="Average  5-min. activity intervals: Weekdays vs. Weekends")
 ```
 
 We can visualy observe that the number of steps are high for all intervals during weekend days, whereas they are concentrated in the morning hours for weekdays.
 
+Another representation would be supperposing both factors on the same graph:
+```{r SuperposeDays, fig.height=6, fig.width=10}     
+xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay, groups=meanStepsPerIntervalNoMissingDay$day, type="l", grid=T, ylab="Average number of steps", xlab="5min intervals from midnight", main="Weekdays (in blue) vs. Weekends (in Purple)")
+```
 
 ## References
 

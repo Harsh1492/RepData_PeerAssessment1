@@ -11,7 +11,7 @@ Coursera - June 2014 session
   - Instructions are in the "doc" sub-directory" (instructions.pdf). 
   - This analysis is performed through PA1_template.Rmd, which is compiled to PA1_template.md which, in turn, generates an HTML output: PA1_template.html. As per assignement instructions, these files are located in the root directory of this GitHub repository (https://github.com/coursera-jm/RepData_PeerAssessment1).
   - Data are saved in the "data" sub-directory.
-  - Figures are generated in the "figures" sub-directory.
+  - Figures are generated in the "figure" sub-directory.
   
 ### Data
 
@@ -28,7 +28,7 @@ dataset.
 
 ### Analysis 
 
-The following step are documented in "PA1_template.Rmd":
+The following steps are documented in "PA1_template.Rmd":
 
 * Loading and preprocessing the data.
 * What is mean total number of steps taken per day?

@@ -7,7 +7,7 @@ https://github.com/coursera-jm/RepData_PeerAssessment1
 
 ## Introduction
 
-We want first ensure, as per instructions, that all statement will be outputs. 
+We want first ensure, as per instructions, that all statement will be outputed. 
 ```{r setup, echo=TRUE}
 # set global options
 opts_chunk$set(echo=TRUE)
@@ -35,13 +35,13 @@ Rversion <- version$version.string
 This analysis has been performed using R software package for statistical analysis.
 The version of R used was `r Rversion`.
 
-This socument has been generated on `r date` at `r time`.
+This document has been generated on `r date` at `r time`.
 
 ## Analysis as per assignement
 
 ### 1. Loading and preprocessing the data
 
-  - Show any code that is needed to load the data
+  1.1 Show any code that is needed to load the data
 
 We download the dataset from the internet and unzip it. Then, we used read.csv to read the file.
 
@@ -91,15 +91,14 @@ The variables included in this dataset are:
 
 The dataset is stored in a comma-separated-value (CSV) file and there are a total of ```r nrow(dataset)``` observations in this dataset for 17,568 expected from the instructions.
 
-- Process/transform the data (if necessary) into a format suitable for your analysis
+1.2 Process/transform the data (if necessary) into a format suitable for your analysis
 
 a. Let's get dates instead of character strings
 ```{r processData1}
 dataset$date <- as.Date(dataset$date)
-str(dataset$date)
 ```
 
-b. Interval are a number in the form hhmm where hh=hours and mm= minutes. We create 2 variables: time since minght, in minutes, and a string factor instead of the numeric concatenation of hours and minutes.
+b. Intervals are stored as a number in the form of hhmm where hh=hours and mm= minutes. We create 2 variables: time since minght, in minutes, and a string factor instead of the numeric concatenation of hours and minutes.
 ```{r processData2}
 dataset$minute <- dataset$interval %% 100
 dataset$hour <- dataset$interval %/% 100
@@ -108,37 +107,41 @@ dataset$elapsed <- dataset$hour * 60 + dataset$minute
 dataset$interval <- as.factor(sprintf("%02d:%02d", dataset$hour, dataset$minute))
 ```
 
+As a pre-processinf step, we need to sum the number of steps for each day in order to prepare the following analysis. Aggregate with the sum fuction does the trick. 
 ```{r processData3}
 # create a table with number of steps per day
-stepsPerDay <- aggregate(steps ~ date, data=dataset, sum)
+sumStepsPerDay <- aggregate(steps ~ date, data=dataset, FUN="sum", na.exclude=T)
+meanStepsPerInterval <- aggregate(steps ~ interval, data=dataset, FUN="mean", na.exclude=T)
+sumStepsPerDay
+meanStepsPerInterval$steps
 ```
 
 ### 2. What is mean total number of steps taken per day?
 
 For this part of the assignment, you can ignore the missing values in the dataset.
 
-  - Make a histogram of the total number of steps taken each day
+  2.1 Make a histogram of the total number of steps taken each day
 ```{r histogramSteps, fig.height=6, fig.width=10}
-histogram(stepsPerDay$steps, breaks=10, main="Total number of steps per day", xlab="Steps per day")
+histogram(sumStepsPerDay$steps, breaks=10, main="Total number of steps per day", xlab="Steps per day")
 ```
 
-  - Calculate and report the mean and median total number of steps taken per day
+  2.2 Calculate and report the mean and median total number of steps taken per day
 
-The mean and median number of steps per days are as follow:
+The mean and median number of steps per days are calculated as follow:
 ```{r meanMedianSteps}
-mean(stepsPerDay$steps, na.rm=TRUE)
-median(stepsPerDay$steps, na.rm=TRUE)
+mean(sumStepsPerDay$steps, na.rm=TRUE)
+median(sumStepsPerDay$steps, na.rm=TRUE)
 ```
 
-### What is the average daily activity pattern?
+### 3. What is the average daily activity pattern?
 
-1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+3.1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r timeSeriesPlot, fig.height=6, fig.width=10}
-plot(interval ~ steps, data=dataset, type="l")
+xyplot(steps ~ interval, data=meanStepsPerInterval, type="l")
 ```
 
 
-2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+3.2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ```{r modeInterval}
 # mode, e.g. http://stackoverflow.com/questions/2547402/standard-library-function-in-r-for-finding-the-mode
 Mode <- function(x) {
@@ -148,65 +151,66 @@ Mode <- function(x) {
 Mode(dataset$interval)
 ```
 
-### Imputing missing values
+### 4. Imputing missing values
 
 Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
 
-1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+4.1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 ```{r calculateMissings}
 sum(is.na(dataset$steps))
 ```
 
-2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+4.2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 ```{r estimateMissings}
 # calculate the mean for each day from other days
 meanPerDay <- aggregate(steps ~ date, data=dataset, mean)
 ```
 
-3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+4.3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 ```{r datasetMissings}
 # replace missig values w
 for(r in 1:100) { #nrow(dataset)){
   if (is.na(dataset$steps[r])) {
     repl <- meanPerDay$steps[meanPerDay$date == dataset$date[r]];
-    cat (r, repl, dataset$date[r], "\n");
+    #cat (r, repl, dataset$date[r], "\n");
     #dataset$steps[r] <- repl;
   }
 }
 str(dataset$steps)
 ```
 
-4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-```{r histogramMissingsEstimated}
-histogram(stepsPerDay$steps, breaks=10, main="Total number of steps per day", xlab="Steps per day")
+4.4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+```{r histogramMissingsEstimated, fig.height=6, fig.width=10}
+library(lattice)
 stepsPerDay <- aggregate(steps ~ date, data=dataset, sum)
+histogram(stepsPerDay$steps, breaks=10, main="Total number of steps per day", xlab="Steps per day")
 mean(stepsPerDay$steps, na.rm=TRUE)
 median(stepsPerDay$steps, na.rm=TRUE)
 ```
 
-3. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+4.5. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r timeSeriesPlotMissingsEstimated, fig.height=8, fig.width=12}
-plotxy(dataset$steps ~ dataset$interval,type="l")
+plot(dataset$steps ~ dataset$interval,type="l")
 ```
 
-### Are there differences in activity patterns between weekdays and weekends?
+### 5. Are there differences in activity patterns between weekdays and weekends?
 
 For this part the "weekdays()" function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+5.1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 ```{r createWeekDayWeekEndFactor}
 dataset$day <-"weekday"
 dataset$day[weekdays(as.Date(dataset$date), abb=T) %in% c("Sat","Sun")] <- "weekend"
 ```
 
 
-2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+5.2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 ```{r timeSeriesPlotMissingsEstimatedWeekDayWeekEnd, fig.height=8, fig.width=12}
 intervalDay <- aggregate(steps ~ interval + day, data=dataset, mean)
 plot(steps ~ interval, data=intervalDay, type="l")
 plot(steps ~ day, data=intervalDay, type="l")
-```
 table(intervalDay)
+```
 
 ## References
 

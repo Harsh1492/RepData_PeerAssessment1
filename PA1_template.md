@@ -37,7 +37,7 @@ Rversion <- version$version.string
 This analysis has been performed using R software package for statistical analysis.
 The version of R used was R version 3.1.0 (2014-04-10).
 
-This document has been generated on 15-Jun-2014 at 15:17:44.
+This document has been generated on 15-Jun-2014 at 15:43:14.
 
 ## Analysis as per assignement
 
@@ -77,11 +77,11 @@ if(!file.exists(filePath)) {
 # read dataset and load data in R
 dataset <- read.csv(filePath, header = TRUE) 
 
-cat ("The dataset is located at", filePath, "and was downloaded on downloaded on", DTDownloaded)
+cat ("The dataset is located at", filePath, "and was downloaded on", DTDownloaded)
 ```
 
 ```
-## The dataset is located at ./data/activity.csv and was downloaded on downloaded on 2014-Jun-12 12:06:46
+## The dataset is located at ./data/activity.csv and was downloaded on 2014-Jun-12 12:06:46
 ```
 
 We verify the dataset structure:
@@ -135,7 +135,7 @@ As a pre-processing step, we sum the number of steps for each day, and we averag
 ```r
 # create a table with number of steps per day
 sumStepsPerDay <- aggregate(steps ~ date, data=dataset, FUN="sum", na.exclude=T)
-meanStepsPerInterval <- aggregate(steps ~ interval, data=dataset, FUN="mean", na.exclude=T)
+meanStepsPerInterval <- aggregate(steps ~ sInterval, data=dataset, FUN="mean", na.exclude=T)
 #sumStepsPerDay
 #meanStepsPerInterval$steps
 ```
@@ -180,7 +180,7 @@ median(sumStepsPerDay$steps, na.rm=TRUE)
 3.1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 ```r
-xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE, ylab="Number of steps", xlab="5-min. intervals from midnight", main="Average number of steps by 5-minutes intervals")
+xyplot(steps ~ sInterval, data=meanStepsPerInterval, type="l", grid=TRUE, ylab="Number of steps", xlab="5-min. intervals from midnight", main="Average number of steps by 5-minutes intervals")
 ```
 
 ![plot of chunk timeSeriesPlot](figure/timeSeriesPlot.png) 
@@ -193,7 +193,7 @@ xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE, ylab="N
 intv <- meanStepsPerInterval$sInterval[which.max(meanStepsPerInterval$steps)]
 ```
 
-The ```` interval contains the maximum number of steps averaged over all days.
+The ``08:35`` interval contains the maximum number of steps averaged over all days.
 
 
 ### 4. Imputing missing values
@@ -232,7 +232,7 @@ There are ``2304`` missing values for the steps variable but no missing values f
 4.2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
 We will use the averaged steps per interval (over all days) to replace the missibg value for a given day/interval. These averaged number of steps are available in the dataframe
-meanStepsPerInterval as decribed below.
+meanStepsPerInterval as shown below.
 
 ```r
 str(meanStepsPerInterval)
@@ -240,21 +240,21 @@ str(meanStepsPerInterval)
 
 ```
 ## 'data.frame':	288 obs. of  2 variables:
-##  $ interval: num  0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 ...
-##  $ steps   : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
+##  $ sInterval: Factor w/ 288 levels "00:00","00:05",..: 1 2 3 4 5 6 7 8 9 10 ...
+##  $ steps    : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
 ```
 
 
 4.3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-We replace each missing steps value buy the average number of steps calculated for the same interval over all other available dates.
+We replace each missing steps value buy the average number of steps calculated for the same interval over all other available dates, and verify it worked.
 
 ```r
 # replace missig values w
 datasetNoMissing <- dataset
 for(r in 1:nrow(datasetNoMissing)){
   if (is.na(datasetNoMissing$steps[r])) {
-    repl <- meanStepsPerInterval$steps[meanStepsPerInterval$interval == datasetNoMissing$interval[r]];
+    repl <- meanStepsPerInterval$steps[meanStepsPerInterval$sInterval == datasetNoMissing$sInterval[r]];
     datasetNoMissing$steps[r] <- repl;
   }
 }
@@ -275,40 +275,25 @@ sum(is.na(datasetNoMissing$steps))
 ```
 
 ```r
-str(dataset)
+str(dataset$steps)
 ```
 
 ```
-## 'data.frame':	17568 obs. of  7 variables:
-##  $ steps    : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ date     : Date, format: "2012-10-01" "2012-10-01" ...
-##  $ interval : num  0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 ...
-##  $ minute   : num  0 5 10 15 20 25 30 35 40 45 ...
-##  $ hour     : num  0 0 0 0 0 0 0 0 0 0 ...
-##  $ elapsed  : num  0 5 10 15 20 25 30 35 40 45 ...
-##  $ sInterval: Factor w/ 288 levels "00:00","00:05",..: 1 2 3 4 5 6 7 8 9 10 ...
+##  int [1:17568] NA NA NA NA NA NA NA NA NA NA ...
 ```
 
 ```r
-str(datasetNoMissing)
+str(datasetNoMissing$steps)
 ```
 
 ```
-## 'data.frame':	17568 obs. of  7 variables:
-##  $ steps    : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
-##  $ date     : Date, format: "2012-10-01" "2012-10-01" ...
-##  $ interval : num  0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 ...
-##  $ minute   : num  0 5 10 15 20 25 30 35 40 45 ...
-##  $ hour     : num  0 0 0 0 0 0 0 0 0 0 ...
-##  $ elapsed  : num  0 5 10 15 20 25 30 35 40 45 ...
-##  $ sInterval: Factor w/ 288 levels "00:00","00:05",..: 1 2 3 4 5 6 7 8 9 10 ...
+##  num [1:17568] 1.717 0.3396 0.1321 0.1509 0.0755 ...
 ```
 
 
 4.4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
 
 ```r
-library(lattice)
 sumStepsPerDayNoMissing <- aggregate(steps ~ date, data=datasetNoMissing, sum)
 histogram(sumStepsPerDayNoMissing$steps, breaks=10, main="Total number of steps per day (missing estimated)", xlab="Steps per day")
 ```
@@ -333,7 +318,7 @@ median(sumStepsPerDayNoMissing$steps, na.rm=TRUE)
 
 Do these values differ from the estimates from the first part of the assignment? 
 
-**Estimating the missing value doesn't change the shape of the histogram. The median and the mean aren't change either.**
+**Estimating the missing values doesn't change the shape of the histogram. The median and the mean aren't much changed either.**
 
 What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
@@ -380,7 +365,7 @@ First, let's produce the graph as per assgnement exemple (2 superposedpanesl):
 
 ```r
 meanStepsPerIntervalNoMissingDay <- aggregate(steps ~ interval + day, data=datasetNoMissing, FUN="mean")
-xyplot(steps ~ interval | day, data=meanStepsPerIntervalNoMissingDay, type="l", grid=T, layout=c(1,2), ylab="Number of steps", xlab="5min intervals from midnight", main="Average  5-min. activity intervals: Weekdays vs. Weekends")
+xyplot(steps ~ interval | day, data=meanStepsPerIntervalNoMissingDay, type="l", grid=T, layout=c(1,2), ylab="Number of steps", xlab="5-min. intervals from midnight", main="Average  5-min. activity intervals: Weekdays vs. Weekends")
 ```
 
 ![plot of chunk timeSeriesPlotMissingsEstimatedWeekDayWeekEnd](figure/timeSeriesPlotMissingsEstimatedWeekDayWeekEnd.png) 
@@ -390,7 +375,7 @@ We can visualy observe that the number of steps are high for all intervals durin
 Another representation would be supperposing both factors on the same graph:
 
 ```r
-xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay, groups=meanStepsPerIntervalNoMissingDay$day, type="l", grid=T, ylab="Average number of steps", xlab="5min intervals from midnight", main="Weekdays (in blue) vs. Weekends (in Purple)")
+xyplot(steps ~ interval, data=meanStepsPerIntervalNoMissingDay, groups=meanStepsPerIntervalNoMissingDay$day, type="l", grid=T, ylab="Average number of steps", xlab="5-min. intervals from midnight", main="Weekdays (in blue) vs. Weekends (in Purple)")
 ```
 
 ![plot of chunk SuperposeDays](figure/SuperposeDays.png) 

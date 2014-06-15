@@ -5,6 +5,7 @@ Coursera - June 2014 session
 
 #### Assignement 1 in https://github.com/coursera-jm/RepData_PeerAssessment1
 
+output published at http://coursera-jm.github.io/RepData_PeerAssessment1/PA1_template.html
 
 ### Introduction
 
@@ -35,3 +36,5 @@ The following steps are documented in "PA1_template.Rmd":
 * What is the average daily activity pattern?
 * Imputing missing values.
 * Are there differences in activity patterns between weekdays and weekends?
+
+The output is published through GitHub gh-pages at http://coursera-jm.github.io/RepData_PeerAssessment1/PA1_template.html

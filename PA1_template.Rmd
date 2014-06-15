@@ -112,8 +112,8 @@ As a pre-processinf step, we need to sum the number of steps for each day in ord
 # create a table with number of steps per day
 sumStepsPerDay <- aggregate(steps ~ date, data=dataset, FUN="sum", na.exclude=T)
 meanStepsPerInterval <- aggregate(steps ~ interval, data=dataset, FUN="mean", na.exclude=T)
-sumStepsPerDay
-meanStepsPerInterval$steps
+#sumStepsPerDay
+#meanStepsPerInterval$steps
 ```
 
 ### 2. What is mean total number of steps taken per day?
@@ -142,50 +142,70 @@ xyplot(steps ~ interval, data=meanStepsPerInterval, type="l", grid=TRUE)
 
 
 3.2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
 ```{r modeInterval}
-meanStepsPerInterval$interval[which.max(meanStepsPerInterval$steps)]
+intv <- meanStepsPerInterval$interval[which.max(meanStepsPerInterval$steps)]
 ```
+
+The ```r intv``` interval contains the maximum number of steps averaged over all days.
 
 ### 4. Imputing missing values
 
-Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+There are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
 
 4.1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r calculateMissings}
+```{r calculateMissingsCount}
+misst <- sum(is.na(dataset$steps))
+misst
 sum(is.na(dataset$steps))
+sum(is.na(dataset$date))
+sum(is.na(dataset$interval))
 ```
+There are ```r misst``` missing values for the steps variable but no missing values for date or interval.
 
 4.2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-```{r estimateMissings}
-# calculate the mean for each day from other days
-meanPerDay <- aggregate(steps ~ date, data=dataset, mean)
+
+We will use the averaged steps per interval (over all days) to replace the missibg value for a given day/interval. These averaged number of steps are available in the dataframe
+meanStepsPerInterval as decribed below.
+```{r meanStepsPerInterval}
+str(meanStepsPerInterval)
 ```
 
 4.3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+We replace each missing steps value buy the average number of steps calculated for the same interval over all other available dates.
 ```{r datasetMissings}
 # replace missig values w
-for(r in 1:100) { #nrow(dataset)){
-  if (is.na(dataset$steps[r])) {
-    repl <- meanPerDay$steps[meanPerDay$date == dataset$date[r]];
-    #cat (r, repl, dataset$date[r], "\n");
-    #dataset$steps[r] <- repl;
+withoutMissing <- dataset
+for(r in 1:nrow(withoutMissing)){
+  if (is.na(withoutMissing$steps[r])) {
+    repl <- meanStepsPerInterval$steps[meanStepsPerInterval$interval == withoutMissing$interval[r]];
+    withoutMissing$steps[r] <- repl;
   }
 }
-str(dataset$steps)
+# we verify it worked
+sum(is.na(dataset$steps))
+sum(is.na(withoutMissing$steps))
+str(withoutMissing$steps)
 ```
 
-4.4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+4.4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
 ```{r histogramMissingsEstimated, fig.height=6, fig.width=10}
 library(lattice)
-stepsPerDay <- aggregate(steps ~ date, data=dataset, sum)
-histogram(stepsPerDay$steps, breaks=10, main="Total number of steps per day", xlab="Steps per day")
-mean(stepsPerDay$steps, na.rm=TRUE)
-median(stepsPerDay$steps, na.rm=TRUE)
+sumStepsPerDayNoMissing <- aggregate(steps ~ date, data=withoutMissing, sum)
+histogram(sumStepsPerDayNoMissing$steps, breaks=10, main="Total number of steps per day (missing estimated)", xlab="Steps per day")
+mean(sumStepsPerDayNoMissing$steps, na.rm=TRUE)
+median(sumStepsPerDayNoMissing$steps, na.rm=TRUE)
 ```
+
+Do these values differ from the estimates from the first part of the assignment? 
+
+What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 4.5. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r timeSeriesPlotMissingsEstimated, fig.height=8, fig.width=12}
-plot(dataset$steps ~ dataset$interval,type="l")
+meanStepsPerIntervalNoMissing <- aggregate(steps ~ interval, data=dataset, FUN="mean", na.exclude=T)
+xyplot(meanStepsPerIntervalNoMissing$steps ~ meanStepsPerIntervalNoMissing$interval,type="l", grid=T)
 ```
 
 ### 5. Are there differences in activity patterns between weekdays and weekends?
